@@ -8,6 +8,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-bump');
+    grunt.loadNpmTasks('grunt-karma');
 
     var appConfig = require('./build.config.js');
     var taskConfig = {
@@ -63,9 +64,17 @@ module.exports = function (grunt) {
                 eqnull: true,
                 debug: true
             }
+        },
+
+        karma: {
+            unit: {
+                configFile: 'karma.conf.js'
+            }
         }
     };
 
     grunt.initConfig(grunt.util._.extend(taskConfig, appConfig));
+
     grunt.registerTask('default', ['jshint', 'uglify:compile']);
+    grunt.registerTask('test', ['jshint', 'karma:unit']);
 };

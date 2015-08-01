@@ -1,0 +1,23 @@
+<!doctype html>
+<html ng-app="ngNavigationTest" ng-controller="AppCtrl">
+<head>
+    <title>ngNavigation Example</title>
+
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">
+
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+
+    <!--Ref: app.js for serve-static root, js/-->
+    <script src="js/angular/angular.js"></script>
+    <script src="js/angular-route/angular-route.js"></script>
+    <script src="js/ngNavigation.js"></script>
+
+    <!--Use the minified version in production.-->
+    <!--<script src="../js/ngNavigation.min.js"></script>-->
+    <script src="main.js"></script>
+</head>
+<body>
+    <div ng-view="main"></div>
+</body>
+</html>

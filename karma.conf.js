@@ -1,7 +1,7 @@
 /**
  * ngNavigation/karma.conf.js
  *
- * Copyright (c) 2015 David Vuong
+ * Copyright (c) 2015 David Vuong <david.vuong256@gmail.com>
  * Licensed MIT
  */
 module.exports = function (config) {
@@ -40,7 +40,7 @@ module.exports = function (config) {
 
         // Start these browsers
         //  Available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-        browsers: ['Chrome'],
+        browsers: ['Chrome', 'PhantomJS'],
 
         // Continuous Integration mode
         //  if true, Karma captures browsers, runs the tests and exits

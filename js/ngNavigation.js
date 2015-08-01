@@ -8,10 +8,17 @@
 
     app.service('Navigation', ['$rootScope', '$window', '$location', function ($rootScope, $window, $location) {
         var self = this;
-
         var defaultInitOptions = {
             appendSlash: false,
             stripSlash:  false
+        };
+
+        // Expose private methods to `_p` so they can be tested.
+        self._p = {
+            _route: _route,
+            _endsWith: _endsWith,
+            _overrideDefaults: _overrideDefaults,
+            _deconstructUrlPath: _deconstructUrlPath
         };
 
         function _endsWith(string, suffix) {
@@ -21,8 +28,8 @@
         function _overrideDefaults(newDefaults) {
             if (!newDefaults) { return; }
 
-            angular.forEach(function (value, key) {
-                if (!angular.isDefined(value)) {
+            angular.forEach(newDefaults, function (value, key) {
+                if (angular.isDefined(value)) {
                     defaultInitOptions[key] = value;
                 }
             });
@@ -46,6 +53,15 @@
                 urlParams[decode(match[1])] = decode(match[2]);
             }
             return { url: baseUrl, params: urlParams };
+        }
+
+        function _route(url, params) {
+            // URL Doesn't contain query params, just call `path`.
+            if (!params) {
+                return $location.path(url);
+            }
+            // Ref: https://docs.angularjs.org/api/ng/service/$location
+            return $location.path(url).search(params);
         }
 
         self.init = function (options) {
@@ -139,15 +155,6 @@
             self._routeStack.push({ url: url, params: options.params, label: options.label });
         };
 
-        function _route(url, params) {
-            // URL Doesn't contain query params, just call `path`.
-            if (!params) {
-                return $location.path(url);
-            }
-            // Ref: https://docs.angularjs.org/api/ng/service/$location
-            return $location.path(url).search(params);
-        }
-
         self.routeTo = function (url, options) {
             if (self._isRouting) { return; }
             options = options || {};
@@ -184,6 +191,10 @@
 
         self.getRouteStack = function () {
             return self._routeStack;
+        };
+
+        self.getDefaultOptions = function () {
+            return defaultInitOptions;
         };
 
         /**

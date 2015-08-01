@@ -44,17 +44,25 @@
         .controller('AppCtrl', function () { });
 
     /* Example route controllers. */
-    app.controller('RouteExampleCtrl1', function (Navigation) {
+    app.controller('RouteExampleCtrl1', function ($scope, Navigation) {
+        $scope.routeToExample4 = function () {
+            Navigation.routeTo('/example4');
+        };
 
+        $scope.back = Navigation.back;
+        $scope.stack = Navigation.getRouteStack();
     });
-    app.controller('RouteExampleCtrl2', function (Navigation) {
-
+    app.controller('RouteExampleCtrl2', function ($scope, Navigation) {
+        $scope.back = Navigation.back;
+        $scope.stack = Navigation.getRouteStack();
     });
-    app.controller('RouteExampleCtrl3', function (Navigation) {
-
+    app.controller('RouteExampleCtrl3', function ($scope, Navigation) {
+        $scope.back = Navigation.back;
+        $scope.stack = Navigation.getRouteStack();
     });
-    app.controller('RouteExampleCtrl4', function (Navigation) {
-
+    app.controller('RouteExampleCtrl4', function ($scope, Navigation) {
+        $scope.back = Navigation.back;
+        $scope.stack = Navigation.getRouteStack();
     });
 
 })();

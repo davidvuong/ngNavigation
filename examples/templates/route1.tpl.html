@@ -1,3 +1,13 @@
-<div class="route-1">
+<div class="route-1 container">
+    <h1>At Example1 <small>(/example1)</small></h1>
 
+    <ul>
+        <li><a href="#/example1">click example1 (href)</a></li>
+        <li><a href="#/example2">click example2 (href)</a></li>
+        <li><a href="#/example3">click example3 (href)</a></li>
+        <li><a href="" ng-click="routeToExample4()">click example4 (ng-click)</a></li>
+    </ul>
+    <button ng-click="back()" class="btn btn-primary">back</button>
+
+    routeStack: {{ stack }}
 </div>

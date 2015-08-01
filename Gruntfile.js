@@ -1,7 +1,7 @@
 /**
  * ngNavigation/Gruntfile.js
  *
- * Copyright (c) 2015 David Vuong
+ * Copyright (c) 2015 David Vuong <david.vuong256@gmail.com>
  * Licensed MIT
  */
 module.exports = function (grunt) {
@@ -75,6 +75,7 @@ module.exports = function (grunt) {
 
     grunt.initConfig(grunt.util._.extend(taskConfig, appConfig));
 
-    grunt.registerTask('default', ['jshint', 'uglify:compile']);
+    grunt.registerTask('build', ['jshint', 'uglify:compile']);
     grunt.registerTask('test', ['jshint', 'karma:unit']);
+    grunt.registerTask('default', ['build']);
 };

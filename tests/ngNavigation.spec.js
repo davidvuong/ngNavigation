@@ -85,4 +85,27 @@ describe('ngNavigation', function () {
             expect(parsed).toEqual({ url: '/example', params: {}});
         });
     });
+
+    describe('Core, self.init', function () {
+        it('should initialize instance variables on self', function () {
+            Navigation.init();
+
+            expect(Navigation._hasInit).toBeDefined();
+            expect(Navigation._isClearing).toBeDefined();
+            expect(Navigation._isRouting).toBeDefined();
+            expect(Navigation._routeStack).toBeDefined();
+        });
+
+        it('should be idempotent', function () {
+            Navigation.init();
+            expect(Navigation._hasInit).toBe(true);
+
+            spyOn(Navigation._p, '_overrideDefaults');
+            Navigation.init();
+
+            expect(Navigation._hasInit).toBe(true);
+            expect(Navigation._p._overrideDefaults.calls.any()).toBe(false);
+        });
+    });
+
 });

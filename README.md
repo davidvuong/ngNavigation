@@ -22,7 +22,7 @@ bower install git@github.com:davidvuong/ngNavigation.git --save
 
 ### Basic Usage
 
-There's only 2 steps you need to do before you can start using `ngNavigation`. The first is to include `ngNavigation` in your app's dependency list. The second is to call `.init()`. `.init()` is idempotent so calling it multiple times will have the same effect if you called it just once.
+There are 2 steps you need to perform before you can start using `ngNavigation`. The first, is to include `ngNavigation` in your app's dependency list. The second, is to call `Navigation.init()`. For example:
 
 ```js
 var app = angular.module('ExampleApp', [
@@ -30,7 +30,7 @@ var app = angular.module('ExampleApp', [
 ]);
 
 app.config(function (Navigation) {
-    Navigation.init();
+    Navigation.init();  // Idempotent operation.
 });
 
 app.controller('AppCtrl', function ($scope, Navigation) {
@@ -44,30 +44,20 @@ TODO!
 
 ### Contributions
 
-**Clone and install dependencies:**
+Clone and install dependencies:
 
-```bash
+```
 git clone git@github.com:davidvuong/ngNavigation.git
 
 cd ngNavigation/
 npm install
 ```
 
-**Build:**
+Build, run tests and serve examples:
 
-```bash
+```
 grunt build
-```
-
-**Tests:**
-
-```bash
 grunt test
-```
 
-**Examples:**
-
-```
-grunt serve
-open http://localhost:3000
+node app.js && open http://localhost:3000
 ```

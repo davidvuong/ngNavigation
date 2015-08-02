@@ -199,7 +199,7 @@ describe('ngNavigation', function () {
             });
         });
 
-        it('should pop stack if A->B [A] then B->A, giving [B] instead of [A, (B), A]', function () {
+        it('should pop stack if A->B [A] then B->A, giving [A, B] instead of [A]', function () {
             inject(function ($rootScope) {
                 Navigation.init();
                 expect(Navigation._routeStack.length).toBe(0);
@@ -217,6 +217,28 @@ describe('ngNavigation', function () {
 
                 var pathB_ = { url: '/test-b', params: {}, label: undefined };
                 expect(Navigation._routeStack[0]).toEqual(pathB_);
+            });
+        });
+    });
+
+    describe('Core, self.peakRouteStack', function () {
+        it('should return an empty object if stack is empty', function () {
+            Navigation.init();
+            expect(Navigation._routeStack.length).toBe(0);
+            expect(Navigation.peakRouteStack()).toEqual({});
+        });
+
+        it('should return an empty object if stack is empty', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+
+                var pathA = {originalPath: '/test-a', params: {}};
+                var pathB = {originalPath: '/test-b', params: {}};
+
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+
+                var pathA_ = {url: '/test-a', params: {}, label: undefined};
+                expect(Navigation.peakRouteStack()).toEqual(pathA_);
             });
         });
     });

@@ -228,7 +228,7 @@ describe('ngNavigation', function () {
             expect(Navigation.peakRouteStack()).toEqual({});
         });
 
-        it('should return an empty object if stack is empty', function () {
+        it('should return the most recent previous route', function () {
             inject(function ($rootScope) {
                 Navigation.init();
 
@@ -241,5 +241,51 @@ describe('ngNavigation', function () {
                 expect(Navigation.peakRouteStack()).toEqual(pathA_);
             });
         });
+    });
+
+    describe('Core, self.isBackRouteAvailable', function () {
+        it('should be true if not empty', function () {
+            Navigation.init();
+            Navigation._routeStack.push({url: '/test-a', params: {}, label: undefined});
+            expect(Navigation.isBackRouteAvailable()).toBe(true);
+        });
+
+        it('should be false if empty', function () {
+            Navigation.init();
+            expect(Navigation.isBackRouteAvailable()).toBe(false);
+        });
+    });
+
+    describe('Core, self.clearRouteStack', function () {
+        it('should clear route stack', function () {
+            Navigation.init();
+            Navigation._routeStack.push({url: '/test-a', params: {}, label: undefined});
+            Navigation.clearRouteStack();
+            expect(Navigation._routeStack.length).toBe(0);
+        });
+
+        it('should not popular route stack with any routes', function () {
+            Navigation.init();
+            Navigation.clearRouteStack();
+            expect(Navigation._routeStack.length).toBe(0);
+        });
+
+        it('should set isClearing=true', function () {
+            Navigation.init();
+            Navigation.clearRouteStack();
+            expect(Navigation._isClearing).toBe(true);
+        });
+    });
+
+    describe('Core, self.pushToRouteStack', function () {
+
+    });
+
+    describe('Core, self.routeTo', function () {
+
+    });
+
+    describe('Core, self.back', function () {
+
     });
 });

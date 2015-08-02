@@ -38,14 +38,14 @@ describe('ngNavigation', function () {
             spyOn($location, 'search');
 
             Navigation._p._route('/example');
-            expect($location.search.calls.any()).toBe(false);
+            expect($location.search).not.toHaveBeenCalled();
         });
 
         it('should call $location.path.search with params', function () {
             spyOn($location, 'search');
 
             Navigation._p._route('/example', { param: '1' });
-            expect($location.search.calls.any()).toBe(true);
+            expect($location.search).toHaveBeenCalled();
         });
     });
 
@@ -104,8 +104,120 @@ describe('ngNavigation', function () {
             Navigation.init();
 
             expect(Navigation._hasInit).toBe(true);
-            expect(Navigation._p._overrideDefaults.calls.any()).toBe(false);
+            expect(Navigation._p._overrideDefaults).not.toHaveBeenCalled();
+        });
+
+        it('should start listening on route changes', function () {
+            inject(function ($rootScope) {
+                spyOn($rootScope, '$on');
+                Navigation.init();
+                expect($rootScope.$on).toHaveBeenCalled();
+            });
+        });
+
+        it('should not update stack if no previous route exists', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+                expect(Navigation._routeStack.length).toBe(0);
+
+                $rootScope.$broadcast('$routeChangeSuccess', {
+                    originalPath: '/test', params: {} }, undefined
+                );
+                expect(Navigation._routeStack.length).toBe(0);
+            });
+        });
+
+        it('should update stack if previous route exists', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+                expect(Navigation._routeStack.length).toBe(0);
+
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+
+                // event, currentPath, previousPath...
+                $rootScope.$broadcast('$routeChangeSuccess', pathA, undefined);
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(1);
+
+                var pathA_ = { url: '/test-a', params: {}, label: undefined };
+                expect(Navigation._routeStack[0]).toEqual(pathA_);
+            });
+        });
+
+        it('should not update if isRouting=true', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+                expect(Navigation._routeStack.length).toBe(0);
+
+                Navigation._isRouting = true;
+                spyOn(Navigation, 'pushToRouteStack');
+
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+
+                expect(Navigation.pushToRouteStack).not.toHaveBeenCalled();
+            });
+        });
+
+        it('should not update when isClearing=true', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+                expect(Navigation._routeStack.length).toBe(0);
+
+                Navigation._isClearing = true;
+                spyOn(Navigation, 'pushToRouteStack');
+
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+
+                expect(Navigation.pushToRouteStack).not.toHaveBeenCalled();
+            });
+        });
+
+        it('should keep route stack empty when isClearing=true', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+                expect(Navigation._routeStack.length).toBe(0);
+
+                // Successfully added a new "previous" route to the stack.
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(1);
+
+                // Clear the stack and set it to not be added in the next route.
+                Navigation._routeStack.length = 0;
+                Navigation._isClearing = true;
+                expect(Navigation._routeStack.length).toBe(0);
+
+                // Cause another route, expect it to remain empty.
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(0);
+            });
+        });
+
+        it('should pop stack if A->B [A] then B->A, giving [B] instead of [A, (B), A]', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+                expect(Navigation._routeStack.length).toBe(0);
+
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+
+                // I'm at /test-b, was at /test-a.
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(1);
+
+                // I'm at going to /test-a was at test-b/
+                $rootScope.$broadcast('$routeChangeSuccess', pathA, pathB);
+                expect(Navigation._routeStack.length).toBe(1);
+
+                var pathB_ = { url: '/test-b', params: {}, label: undefined };
+                expect(Navigation._routeStack[0]).toEqual(pathB_);
+            });
         });
     });
-
 });

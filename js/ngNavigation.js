@@ -67,7 +67,7 @@
         self.init = function (options) {
             if (this._hasInit) { return; }
 
-            _overrideDefaults(options);
+            self._p._overrideDefaults(options);
             self._hasInit    = true;
             self._isClearing = false;
             self._isRouting  = false;
@@ -134,7 +134,7 @@
             if (!url) { return; }
 
             // `url` might contain query params, override `options.params` if so.
-            var parsedUrl = _deconstructUrlPath(url);
+            var parsedUrl = self._p._deconstructUrlPath(url);
             if (parsedUrl.params && !angular.equals(parsedUrl.params, {})) {
                 url = parsedUrl.url;
                 options.params = parsedUrl.params;
@@ -142,10 +142,10 @@
             options.params = options.params || {};
 
             // Append or remove the trailing "/".
-            if (defaultInitOptions.appendSlash && !_endsWith(url, '/')) {
+            if (defaultInitOptions.appendSlash && !self._p._endsWith(url, '/')) {
                 url += '/';
             }
-            if (defaultInitOptions.stripSlash && _endsWith(url, '/')) {
+            if (defaultInitOptions.stripSlash && self._p._endsWith(url, '/')) {
                 url = url.substring(0, url.length - 1);
             }
 
@@ -168,21 +168,16 @@
             if (options.clearStack) {
                 self.clearRouteStack();
             }
-            _route(url, options.params);
+            self._p._route(url, options.params);
             self._isRouting = false;
         };
 
         self.back = function () {
             if (!self.isBackRouteAvailable()) { return; }
 
-            // Try to use `$window.location.back()` as often as we can.
-            var backRoute = self._routeStack.pop();
+            self._routeStack.pop();
             self._isClearing = true;
-
-            if ($window.location.referrer === backRoute.url) {
-                return $window.location.back();
-            }
-            return _route(backRoute.url, backRoute.params);
+            return $window.history.back();
         };
 
         self.isBackRouteAvailable = function () {

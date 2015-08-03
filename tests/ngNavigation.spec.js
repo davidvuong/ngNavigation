@@ -389,10 +389,63 @@ describe('ngNavigation', function () {
     });
 
     describe('Core, self.routeTo', function () {
+        it('should not route when isRouting=true', function () {
+            Navigation.init();
 
+            spyOn(Navigation._p, '_route');
+            Navigation._isRouting = true;
+            Navigation.routeTo('/accounts');
+            expect(Navigation._p._route).not.toHaveBeenCalled();
+        });
+
+        it('should clear stack when clearStack=true', function () {
+            Navigation.init();
+
+            spyOn(Navigation, 'clearRouteStack');
+            Navigation.routeTo('/accounts', { clearStack: true });
+            expect(Navigation.clearRouteStack).toHaveBeenCalled();
+        });
+
+        it('should not clear stack when clearStack is not set', function () {
+            Navigation.init();
+
+            spyOn(Navigation, 'clearRouteStack');
+            Navigation.routeTo('/accounts');
+            expect(Navigation.clearRouteStack).not.toHaveBeenCalled();
+        });
+
+        it('should route when routeTo is called', function () {
+            Navigation.init();
+
+            spyOn(Navigation._p, '_route');
+            Navigation.routeTo('/accounts');
+            expect(Navigation._p._route).toHaveBeenCalled();
+        });
     });
 
     describe('Core, self.back', function () {
+        it('should not pop stack if stack is empty', function () {
+            Navigation.init();
 
+            spyOn(Navigation._routeStack, 'pop');
+            Navigation.back();
+            expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
+        });
+
+        it('should pop stack when going back to previous page', function () {
+            inject(function ($rootScope, $window) {
+                Navigation.init();
+
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(1);
+
+                // Stub out `$window.history.back` to avoid karma errors.
+                spyOn($window.history, 'back');
+                Navigation.back();
+                expect(Navigation._routeStack.length).toBe(0);
+            });
+        });
     });
 });

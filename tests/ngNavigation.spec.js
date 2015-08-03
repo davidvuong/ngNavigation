@@ -264,7 +264,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack.length).toBe(0);
         });
 
-        it('should not popular route stack with any routes', function () {
+        it('should not populate route stack with any new routes', function () {
             Navigation.init();
             Navigation.clearRouteStack();
             expect(Navigation._routeStack.length).toBe(0);
@@ -278,7 +278,114 @@ describe('ngNavigation', function () {
     });
 
     describe('Core, self.pushToRouteStack', function () {
+        it('should push to route stack', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack('/accounts');
 
+            var path = { url: '/accounts', params: {}, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should not push to route stack if duplicate', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack('/accounts');
+            Navigation.pushToRouteStack('/accounts');
+            Navigation.pushToRouteStack('/accounts', { params: { x: 1 }});
+
+            expect(Navigation._routeStack.length).toBe(1);
+        });
+
+        it('should label the route if label exists', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack('/accounts', { label: 'Back' });
+
+            var path = { url: '/accounts', params: {}, label: 'Back' };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should parse query params from url if exists', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack('/accounts?x=y&a=b&d=d');
+
+            var path = { url: '/accounts', params: { x: 'y', a: 'b', d: 'd' }, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should override params if query params in url', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack('/accounts?x=y', { params: { a: 'b' } });
+
+            var path = { url: '/accounts', params: { x: 'y' }, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should push with options.params if exists', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack('/accounts/10', { params: { a: 'b'} });
+
+            var path = { url: '/accounts/10', params: { a: 'b' }, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should not push if url does not exist', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack();
+            expect(Navigation._routeStack.length).toBe(0);
+        });
+
+        it('should not push if url does not exist', function () {
+            Navigation.init();
+            Navigation.pushToRouteStack();
+            expect(Navigation._routeStack.length).toBe(0);
+        });
+
+        it('should add trailing slash if not exists', function () {
+            Navigation.init({ appendSlash: true });
+            Navigation.pushToRouteStack('/accounts');
+
+            var path = { url: '/accounts/', params: {}, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should add trailing slash if not exists with query params', function () {
+            Navigation.init({ appendSlash: true });
+            Navigation.pushToRouteStack('/accounts?x=y');
+
+            var path = { url: '/accounts/', params: { x: 'y' }, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should not append slash if already exists', function () {
+            Navigation.init({ appendSlash: true });
+            Navigation.pushToRouteStack('/accounts/');
+
+            var path = { url: '/accounts/', params: {}, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should should strip slash if exists', function () {
+            Navigation.init({ stripSlash: true });
+            Navigation.pushToRouteStack('/accounts/');
+
+            var path = { url: '/accounts', params: {}, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should should strip slash if exists with query params', function () {
+            Navigation.init({ stripSlash: true });
+            Navigation.pushToRouteStack('/accounts/?x=y');
+
+            var path = { url: '/accounts', params: { x: 'y' }, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
+
+        it('should should not strip slash if not exists', function () {
+            Navigation.init({ stripSlash: true });
+            Navigation.pushToRouteStack('/accounts');
+
+            var path = { url: '/accounts', params: {}, label: undefined };
+            expect(Navigation._routeStack[0]).toEqual(path);
+        });
     });
 
     describe('Core, self.routeTo', function () {

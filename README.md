@@ -5,17 +5,17 @@ ngNavigation a zero dependency AngularJS service that provides a simple way to n
 
 ### Setup and install
 
-```bash
-npm install ng-navigation --save
+```
+npm install ngNavigation --save
 ```
 
 or using bower:
 
 ```
-bower install ng-navigation --save
+bower install ngNavigation --save
 ```
 
-### Basic Usage
+### Basic usage
 
 There are 2 steps you need to perform before you can start using `ngNavigation`. The first, is to include `ngNavigation` in your app's dependency list. The second, is to call `Navigation.init()`. For example:
 

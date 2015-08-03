@@ -14,4 +14,4 @@ app.use('/js', serveStatic(__dirname + '/js'));
 app.use('/js', serveStatic(__dirname + '/node_modules'));
 app.listen(3000);
 
-console.log('Serving ngNavigation/examples/ on port 3000...');
+console.log('Serving ngNavigation/examples/ on http://localhost:3000');

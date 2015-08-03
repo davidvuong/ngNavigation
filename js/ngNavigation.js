@@ -131,12 +131,15 @@
         self.pushToRouteStack = function (url, options) {
             options = options || {};
 
+            if (!url) { return; }
+
             // `url` might contain query params, override `options.params` if so.
             var parsedUrl = _deconstructUrlPath(url);
-            if (!options.params) {
+            if (parsedUrl.params && !angular.equals(parsedUrl.params, {})) {
                 url = parsedUrl.url;
                 options.params = parsedUrl.params;
             }
+            options.params = options.params || {};
 
             // Append or remove the trailing "/".
             if (defaultInitOptions.appendSlash && !_endsWith(url, '/')) {
@@ -152,7 +155,9 @@
             if (self.peakRouteStack().url === url) {
                 return;
             }
-            self._routeStack.push({ url: url, params: options.params, label: options.label });
+
+            var path = { url: url, params: options.params, label: options.label };
+            self._routeStack.push(path);
         };
 
         self.routeTo = function (url, options) {

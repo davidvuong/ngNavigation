@@ -172,9 +172,21 @@
             self._isRouting = false;
         };
 
-        self.back = function () {
-            if (!self.isBackRouteAvailable()) { return; }
+        self.back = function (fallBackRoute) {
+            fallBackRoute = fallBackRoute || {};
 
+            var isBackRouteAvailable = self.isBackRouteAvailable();
+            var isFallbackRouteAvailable = !angular.equals(fallBackRoute, {});
+
+            // No routes in the routeStack & no fallback provided.
+            if (!isBackRouteAvailable && !isFallbackRouteAvailable) {
+                return;
+            }
+            // No routes in the routeStack however fallback provided.
+            if (!isBackRouteAvailable && isFallbackRouteAvailable) {
+                return self._p._route(fallBackRoute.url, fallBackRoute.params || {});
+            }
+            // There are routes in the routeStack.
             self._routeStack.pop();
             self._isClearing = true;
             return $window.history.back();

@@ -424,12 +424,34 @@ describe('ngNavigation', function () {
     });
 
     describe('Core, self.back', function () {
-        it('should not pop stack if stack is empty', function () {
+        it('should not pop stack when stack is empty', function () {
             Navigation.init();
 
             spyOn(Navigation._routeStack, 'pop');
             Navigation.back();
             expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
+        });
+
+        it('should use fallback stack when stack is empty', function () {
+            Navigation.init();
+
+            spyOn(Navigation._routeStack, 'pop');
+            spyOn(Navigation._p, '_route');
+            Navigation.back({ url: '/accounts', params: { x: 'y' } });
+
+            expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
+            expect(Navigation._p._route).toHaveBeenCalled();
+        });
+
+        it('should use fallback stack when stack is empty (only url)', function () {
+            Navigation.init();
+
+            spyOn(Navigation._routeStack, 'pop');
+            spyOn(Navigation._p, '_route');
+            Navigation.back({ url: '/accounts' });
+
+            expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
+            expect(Navigation._p._route).toHaveBeenCalledWith('/accounts', {});
         });
 
         it('should pop stack when going back to previous page', function () {

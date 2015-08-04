@@ -15,11 +15,11 @@ describe('ngNavigation', function () {
     }));
 
     describe('Auxiliary, p._endsWith', function () {
-        it('should be true if ends up suffix', function () {
+        it('should be true when str ends with suffix', function () {
             expect(Navigation._p._endsWith('hello, world/', '/')).toBe(true);
         });
 
-        it('should be false if not ends up suffix', function () {
+        it('should be false when str does not end suffix', function () {
             expect(Navigation._p._endsWith('hello, world/', 'x')).toBe(false);
         });
 
@@ -34,14 +34,14 @@ describe('ngNavigation', function () {
             $location = _$location_;
         }));
 
-        it('should call $location.path without params', function () {
+        it('should call $location.path when no params provided', function () {
             spyOn($location, 'search');
 
             Navigation._p._route('/example');
             expect($location.search).not.toHaveBeenCalled();
         });
 
-        it('should call $location.path.search with params', function () {
+        it('should call $location.path.search when params provided', function () {
             spyOn($location, 'search');
 
             Navigation._p._route('/example', { param: '1' });
@@ -50,23 +50,23 @@ describe('ngNavigation', function () {
     });
 
     describe('Auxiliary, p._overridesDefaults', function () {
-        it('should not override with undefined values', function () {
+        it('should not override when values are undefined', function () {
             Navigation._p._overrideDefaults({ appendSlash: undefined });
             expect(Navigation.getDefaultOptions().appendSlash).toBe(false);
         });
 
-        it('should override with defined values', function () {
+        it('should override when values are defined', function () {
             Navigation._p._overrideDefaults({ stripSlash: true });
             expect(Navigation.getDefaultOptions().stripSlash).toBe(true);
         });
 
-        it('should throw exception if stripSlash and appendSlash are true', function () {
+        it('should throw exception when stripSlash and appendSlash are true', function () {
             expect(function () {
                 Navigation._p._overrideDefaults({ stripSlash: true, appendSlash: true });
             }).toThrow();
         });
 
-        it('should not override with no values at all', function () {
+        it('should not override when no values provided at all', function () {
             var copy = {};
             angular.copy(Navigation.getDefaultOptions(), copy);
             Navigation._p._overrideDefaults({});
@@ -75,19 +75,19 @@ describe('ngNavigation', function () {
     });
 
     describe('Auxiliary, p._deconstructUrlPath', function () {
-        it('should separate the url and params if both exists', function () {
+        it('should separate the url and params when both exists', function () {
             var parsed = Navigation._p._deconstructUrlPath('/example?hello=world&x=y');
             expect(parsed).toEqual({ url: '/example', params: { hello: 'world', x: 'y' }});
         });
 
-        it('should not give me params if no query params in url', function () {
+        it('should not give me params when no query params in url', function () {
             var parsed = Navigation._p._deconstructUrlPath('/example');
             expect(parsed).toEqual({ url: '/example', params: {}});
         });
     });
 
     describe('Core, self.init', function () {
-        it('should initialize instance variables on self', function () {
+        it('should initialize instance variables on self when init is called', function () {
             Navigation.init();
 
             expect(Navigation._hasInit).toBeDefined();
@@ -96,7 +96,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack).toBeDefined();
         });
 
-        it('should be idempotent', function () {
+        it('should be idempotent when called init called multiple times', function () {
             Navigation.init();
             expect(Navigation._hasInit).toBe(true);
 
@@ -107,7 +107,7 @@ describe('ngNavigation', function () {
             expect(Navigation._p._overrideDefaults).not.toHaveBeenCalled();
         });
 
-        it('should start listening on route changes', function () {
+        it('should start listening on route changes when init is called', function () {
             inject(function ($rootScope) {
                 spyOn($rootScope, '$on');
                 Navigation.init();
@@ -115,7 +115,7 @@ describe('ngNavigation', function () {
             });
         });
 
-        it('should not update stack if no previous route exists', function () {
+        it('should not update stack when no previous route exists', function () {
             inject(function ($rootScope) {
                 Navigation.init();
                 expect(Navigation._routeStack.length).toBe(0);
@@ -127,7 +127,7 @@ describe('ngNavigation', function () {
             });
         });
 
-        it('should update stack if previous route exists', function () {
+        it('should update stack when previous route exists', function () {
             inject(function ($rootScope) {
                 Navigation.init();
                 expect(Navigation._routeStack.length).toBe(0);
@@ -145,7 +145,7 @@ describe('ngNavigation', function () {
             });
         });
 
-        it('should not update if isRouting=true', function () {
+        it('should not update when isRouting=true', function () {
             inject(function ($rootScope) {
                 Navigation.init();
                 expect(Navigation._routeStack.length).toBe(0);
@@ -199,7 +199,7 @@ describe('ngNavigation', function () {
             });
         });
 
-        it('should pop stack if A->B [A] then B->A, giving [A, B] instead of [A]', function () {
+        it('should pop stack when A->B [A] then B->A, giving [A, B] instead of [A]', function () {
             inject(function ($rootScope) {
                 Navigation.init();
                 expect(Navigation._routeStack.length).toBe(0);
@@ -222,18 +222,18 @@ describe('ngNavigation', function () {
     });
 
     describe('Core, self.peakRouteStack', function () {
-        it('should return an empty object if stack is empty', function () {
+        it('should return an empty object when stack is empty', function () {
             Navigation.init();
             expect(Navigation._routeStack.length).toBe(0);
             expect(Navigation.peakRouteStack()).toEqual({});
         });
 
-        it('should return the most recent previous route', function () {
+        it('should return the most recent previous route when stack is not empty', function () {
             inject(function ($rootScope) {
                 Navigation.init();
 
-                var pathA = {originalPath: '/test-a', params: {}};
-                var pathB = {originalPath: '/test-b', params: {}};
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
 
                 $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
 
@@ -244,33 +244,33 @@ describe('ngNavigation', function () {
     });
 
     describe('Core, self.isBackRouteAvailable', function () {
-        it('should be true if not empty', function () {
+        it('should be true when not empty', function () {
             Navigation.init();
             Navigation._routeStack.push({url: '/test-a', params: {}, label: undefined});
             expect(Navigation.isBackRouteAvailable()).toBe(true);
         });
 
-        it('should be false if empty', function () {
+        it('should be false when empty', function () {
             Navigation.init();
             expect(Navigation.isBackRouteAvailable()).toBe(false);
         });
     });
 
     describe('Core, self.clearRouteStack', function () {
-        it('should clear route stack', function () {
+        it('should clear route stack when called', function () {
             Navigation.init();
             Navigation._routeStack.push({url: '/test-a', params: {}, label: undefined});
             Navigation.clearRouteStack();
             expect(Navigation._routeStack.length).toBe(0);
         });
 
-        it('should not populate route stack with any new routes', function () {
+        it('should not populate route stack with any new routes when called', function () {
             Navigation.init();
             Navigation.clearRouteStack();
             expect(Navigation._routeStack.length).toBe(0);
         });
 
-        it('should set isClearing=true', function () {
+        it('should set isClearing=true when called', function () {
             Navigation.init();
             Navigation.clearRouteStack();
             expect(Navigation._isClearing).toBe(true);
@@ -286,7 +286,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should not push to route stack if duplicate', function () {
+        it('should not push to route stack when duplicate routes are provided', function () {
             Navigation.init();
             Navigation.pushToRouteStack('/accounts');
             Navigation.pushToRouteStack('/accounts');
@@ -295,7 +295,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack.length).toBe(1);
         });
 
-        it('should label the route if label exists', function () {
+        it('should label the route when the label exists', function () {
             Navigation.init();
             Navigation.pushToRouteStack('/accounts', { label: 'Back' });
 
@@ -303,7 +303,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should parse query params from url if exists', function () {
+        it('should parse query params from url when query params exist', function () {
             Navigation.init();
             Navigation.pushToRouteStack('/accounts?x=y&a=b&d=d');
 
@@ -311,7 +311,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should override params if query params in url', function () {
+        it('should override params when query params in url', function () {
             Navigation.init();
             Navigation.pushToRouteStack('/accounts?x=y', { params: { a: 'b' } });
 
@@ -319,7 +319,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should push with options.params if exists', function () {
+        it('should push with options.params when params exists', function () {
             Navigation.init();
             Navigation.pushToRouteStack('/accounts/10', { params: { a: 'b'} });
 
@@ -327,19 +327,19 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should not push if url does not exist', function () {
+        it('should not push when url does not exist', function () {
             Navigation.init();
             Navigation.pushToRouteStack();
             expect(Navigation._routeStack.length).toBe(0);
         });
 
-        it('should not push if url does not exist', function () {
+        it('should not push when url does not exist', function () {
             Navigation.init();
             Navigation.pushToRouteStack();
             expect(Navigation._routeStack.length).toBe(0);
         });
 
-        it('should add trailing slash if not exists', function () {
+        it('should add trailing slash when slash does not exist', function () {
             Navigation.init({ appendSlash: true });
             Navigation.pushToRouteStack('/accounts');
 
@@ -347,7 +347,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should add trailing slash if not exists with query params', function () {
+        it('should add trailing slash when slash does not exist with query params', function () {
             Navigation.init({ appendSlash: true });
             Navigation.pushToRouteStack('/accounts?x=y');
 
@@ -355,7 +355,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should not append slash if already exists', function () {
+        it('should not append slash when already exists', function () {
             Navigation.init({ appendSlash: true });
             Navigation.pushToRouteStack('/accounts/');
 
@@ -363,7 +363,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should should strip slash if exists', function () {
+        it('should should strip slash when slash exists', function () {
             Navigation.init({ stripSlash: true });
             Navigation.pushToRouteStack('/accounts/');
 
@@ -371,7 +371,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should should strip slash if exists with query params', function () {
+        it('should should strip slash when slash exists with query params', function () {
             Navigation.init({ stripSlash: true });
             Navigation.pushToRouteStack('/accounts/?x=y');
 
@@ -379,7 +379,7 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack[0]).toEqual(path);
         });
 
-        it('should should not strip slash if not exists', function () {
+        it('should should not strip slash when slash does not exist', function () {
             Navigation.init({ stripSlash: true });
             Navigation.pushToRouteStack('/accounts');
 

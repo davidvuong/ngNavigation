@@ -44,8 +44,8 @@ describe('ngNavigation', function () {
         it('should call $location.path.search when params provided', function () {
             spyOn($location, 'search');
 
-            Navigation._p._route('/example', { param: '1' });
-            expect($location.search).toHaveBeenCalled();
+            Navigation._p._route('/example', { x: 'y' });
+            expect($location.search).toHaveBeenCalledWith({ x: 'y' });
         });
     });
 
@@ -396,6 +396,16 @@ describe('ngNavigation', function () {
             Navigation._isRouting = true;
             Navigation.routeTo('/accounts');
             expect(Navigation._p._route).not.toHaveBeenCalled();
+        });
+
+        it('should override query params in url when params is provided', function () {
+            Navigation.init();
+
+            spyOn(Navigation._p, '_route');
+
+            var options = { params: { tab: 'personal-details' } };
+            Navigation.routeTo('/accounts?tab=payments', options);
+            expect(Navigation._p._route).toHaveBeenCalledWith('/accounts', options.params);
         });
 
         it('should clear stack when clearStack=true', function () {

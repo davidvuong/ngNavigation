@@ -168,23 +168,32 @@
             if (options.clearStack) {
                 self.clearRouteStack();
             }
+
+            // `url` might contain query params, override `options.params` if so.
+            var parsedUrl = self._p._deconstructUrlPath(url);
+            if (parsedUrl.params && !angular.equals(parsedUrl.params, {})) {
+                url = parsedUrl.url;
+                options.params = parsedUrl.params;
+            }
+            options.params = options.params || {};
+
             self._p._route(url, options.params);
             self._isRouting = false;
         };
 
-        self.back = function (fallBackRoute) {
-            fallBackRoute = fallBackRoute || {};
+        self.back = function (fallbackRoute) {
+            fallbackRoute = fallbackRoute || {};
 
             var isBackRouteAvailable = self.isBackRouteAvailable();
-            var isFallbackRouteAvailable = !angular.equals(fallBackRoute, {});
+            var isfallbackRouteAvailable = !angular.equals(fallbackRoute, {});
 
             // No routes in the routeStack & no fallback provided.
-            if (!isBackRouteAvailable && !isFallbackRouteAvailable) {
+            if (!isBackRouteAvailable && !isfallbackRouteAvailable) {
                 return;
             }
             // No routes in the routeStack however fallback provided.
-            if (!isBackRouteAvailable && isFallbackRouteAvailable) {
-                return self._p._route(fallBackRoute.url, fallBackRoute.params || {});
+            if (!isBackRouteAvailable && isfallbackRouteAvailable) {
+                return self._p._route(fallbackRoute.url, fallbackRoute.params || {});
             }
             // There are routes in the routeStack.
             self._routeStack.pop();

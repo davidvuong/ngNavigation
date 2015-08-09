@@ -6,18 +6,20 @@ ngNavigation a zero dependency AngularJS service that provides a simple way to n
 ### Setup and install
 
 ```
-npm install ngNavigation --save
+npm install ngNavigation
 ```
 
 or using bower:
 
 ```
-bower install ngNavigation --save
+bower install ngNavigation
 ```
 
 ### Basic usage
 
-There are 2 steps you need to perform before you can start using `ngNavigation`. The first, is to include `ngNavigation` in your app's dependency list. The second, is to call `Navigation.init()`. For example:
+There are 2 steps you need to perform before you can start using `ngNavigation`. The first, is to include `ngNavigation` in your application's dependency list. The second, is to call `Navigation.init()`.
+
+For example:
 
 ```js
 var app = angular.module('ExampleApp', [
@@ -34,8 +36,6 @@ app.controller('AppCtrl', function ($scope, Navigation) {
 ```
 
 ### Documentation
-
-ngNavigation public methods:
 
 #### `.init(options)`
 
@@ -82,7 +82,9 @@ var options = { params: { tab: 'payments' } };
 ngNavigation.routeTo('/accounts?tab=details', options);
 ```
 
-`.routeTo` can also be called with `options = { clearStack: true }`. This is useful when you want to clear the route history before or after routing. For example, you have a side-menu that's present throughout the app. The side-menu is the root of your navigation. It does not make much sense to be able to go back after re-routing via the root.
+`.routeTo` can also be called with `options = { clearStack: true }`. This is useful when you want to clear the route history before or after routing.
+
+For example, you have a side-menu that's present throughout the app. The side-menu is the root of your navigation. It does not make much sense to be able to go back after re-routing via the root.
 
 #### `.back(fallbackRoute)`
 

@@ -35,16 +35,18 @@ app.controller('AppCtrl', function ($scope, Navigation) {
 
 ### Documentation
 
-ngNavigation provides a small API to control your application's navigation. The following are the public methods available.
+ngNavigation public methods:
 
 #### `.init(options)`
 
-`.init` Initializes the ngNavigation service, registering a listener to route changes. This should be called before you make other calls to ngNavigation. These route changes can be with through `href|ng-href` links in the view, `$location.path` calls via Angular, or `routeTo` calls through the `ngNavigation` API.
+`.init` Initializes the ngNavigation service, registering a listener to route changes. This should be called before you make other calls to ngNavigation.
+
+Route changes can be with through `href|ng-href` links in the view, `$location.path` calls via Angular, or `routeTo` calls through the `ngNavigation` API.
 
 The `.init` method takes an optional argument, `options` in the form:
 
 ```js
-{ appendSlash: false, stripSlash: false }
+{ appendSlash: false, stripSlash: false };
 ```
 
 By default, both are set to `false`. These properties are mutually exclusive, meaning only one can be set to true at any single time. They're also optional.
@@ -84,7 +86,9 @@ ngNavigation.routeTo('/accounts?tab=details', options);
 
 #### `.back(fallbackRoute)`
 
-`.back` calls `$window.history.back()` when a previous route is available, popping from the route stack. When no routes are available, no operations are made. `.back` also takes in an optional argument, `fallbackRoute` in the form:
+Routes back to the previous route. `back` calls `$window.history.back()` when a previous route is available, popping from the route stack. When no routes are available, no operations are made.
+
+`.back` also takes in an optional argument, `fallbackRoute` in the form:
 
 ```js
 { url: '...', params: {} };
@@ -92,7 +96,11 @@ ngNavigation.routeTo('/accounts?tab=details', options);
 
 Having a `fallbackRoute` ensures that if the route stack is empty, the call to `.back` will fallback to the provided `fallbackRoute`.
 
-The `fallbackRoute` could be useful when you have external deep links to your app (e.g. an email notification). When a user clicks on the deep link (e.g. `/app/settings/notifications`), the route stack is empty. This means if you have a navigation bar with a back button that hooks onto `ngNavigation.back`, clicking that button won't take you back because the stack is empty. Having a `fallbackUrl` will ensure that navigation after deep links work. For example:
+The `fallbackRoute` could be useful when you have external deep links to your app (e.g. an email notification).
+
+When a user clicks on the deep link (e.g. `/app/settings/notifications`), the route stack is empty. This means if you have a navigation bar with a back button that hooks onto `ngNavigation.back`, clicking that button won't take you back because the stack is empty. Having a `fallbackUrl` will ensure that navigation after deep links work.
+
+For example:
 
 ```js
 // navigation.js (navbar controller).

@@ -16,15 +16,15 @@ describe('ngNavigation', function () {
 
     describe('Auxiliary, p._endsWith', function () {
         it('should be true when str ends with suffix', function () {
-            expect(Navigation._p._endsWith('hello, world/', '/')).toBe(true);
+            expect(Navigation._endsWith('hello, world/', '/')).toBe(true);
         });
 
         it('should be false when str does not end suffix', function () {
-            expect(Navigation._p._endsWith('hello, world/', 'x')).toBe(false);
+            expect(Navigation._endsWith('hello, world/', 'x')).toBe(false);
         });
 
         it('should be false when the string is empty', function () {
-            expect(Navigation._p._endsWith('', '/')).toBe(false);
+            expect(Navigation._endsWith('', '/')).toBe(false);
         });
     });
 
@@ -37,51 +37,51 @@ describe('ngNavigation', function () {
         it('should call $location.path when no params provided', function () {
             spyOn($location, 'search');
 
-            Navigation._p._route('/example');
+            Navigation._route('/example');
             expect($location.search).not.toHaveBeenCalled();
         });
 
         it('should call $location.path.search when params provided', function () {
             spyOn($location, 'search');
 
-            Navigation._p._route('/example', { x: 'y' });
+            Navigation._route('/example', { x: 'y' });
             expect($location.search).toHaveBeenCalledWith({ x: 'y' });
         });
     });
 
     describe('Auxiliary, p._overridesDefaults', function () {
         it('should not override when values are undefined', function () {
-            Navigation._p._overrideDefaults({ appendSlash: undefined });
+            Navigation._overrideDefaults({ appendSlash: undefined });
             expect(Navigation.getDefaultOptions().appendSlash).toBe(false);
         });
 
         it('should override when values are defined', function () {
-            Navigation._p._overrideDefaults({ stripSlash: true });
+            Navigation._overrideDefaults({ stripSlash: true });
             expect(Navigation.getDefaultOptions().stripSlash).toBe(true);
         });
 
         it('should throw exception when stripSlash and appendSlash are true', function () {
             expect(function () {
-                Navigation._p._overrideDefaults({ stripSlash: true, appendSlash: true });
+                Navigation._overrideDefaults({ stripSlash: true, appendSlash: true });
             }).toThrow();
         });
 
         it('should not override when no values provided at all', function () {
             var copy = {};
             angular.copy(Navigation.getDefaultOptions(), copy);
-            Navigation._p._overrideDefaults({});
+            Navigation._overrideDefaults({});
             expect(copy).toEqual(Navigation.getDefaultOptions());
         });
     });
 
     describe('Auxiliary, p._deconstructUrlPath', function () {
         it('should separate the url and params when both exists', function () {
-            var parsed = Navigation._p._deconstructUrlPath('/example?hello=world&x=y');
+            var parsed = Navigation._deconstructUrlPath('/example?hello=world&x=y');
             expect(parsed).toEqual({ url: '/example', params: { hello: 'world', x: 'y' }});
         });
 
         it('should not give me params when no query params in url', function () {
-            var parsed = Navigation._p._deconstructUrlPath('/example');
+            var parsed = Navigation._deconstructUrlPath('/example');
             expect(parsed).toEqual({ url: '/example', params: {}});
         });
     });
@@ -100,11 +100,11 @@ describe('ngNavigation', function () {
             Navigation.init();
             expect(Navigation._hasInit).toBe(true);
 
-            spyOn(Navigation._p, '_overrideDefaults');
+            spyOn(Navigation, '_overrideDefaults');
             Navigation.init();
 
             expect(Navigation._hasInit).toBe(true);
-            expect(Navigation._p._overrideDefaults).not.toHaveBeenCalled();
+            expect(Navigation._overrideDefaults).not.toHaveBeenCalled();
         });
 
         it('should start listening on route changes when init is called', function () {
@@ -392,20 +392,51 @@ describe('ngNavigation', function () {
         it('should not route when isRouting=true', function () {
             Navigation.init();
 
-            spyOn(Navigation._p, '_route');
+            spyOn(Navigation, '_route');
             Navigation._isRouting = true;
             Navigation.routeTo('/accounts');
-            expect(Navigation._p._route).not.toHaveBeenCalled();
+            expect(Navigation._route).not.toHaveBeenCalled();
+        });
+
+        it('should ignore the previous route when route in ignore list', function () {
+            inject(function ($rootScope) {
+                Navigation.init({ ignoreRoutes: ['/test-b'] });
+
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(1);
+
+                var pathC = { originalPath: '/test-c', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathC, pathB);
+                expect(Navigation._routeStack.length).toBe(1);
+            });
+        });
+
+        it('should clear the routeStack when routing to the root', function () {
+            inject(function ($rootScope) {
+                Navigation.init({ rootRoute: '/root' });
+
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(1);
+
+                var rootPath = { originalPath: '/root', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', rootPath, pathA);
+                expect(Navigation._routeStack.length).toBe(0);
+                expect(Navigation._isClearing).toBe(true);
+            });
         });
 
         it('should override query params in url when params is provided', function () {
             Navigation.init();
 
-            spyOn(Navigation._p, '_route');
+            spyOn(Navigation, '_route');
 
             var options = { params: { tab: 'personal-details' } };
             Navigation.routeTo('/accounts?tab=payments', options);
-            expect(Navigation._p._route).toHaveBeenCalledWith('/accounts', options.params);
+            expect(Navigation._route).toHaveBeenCalledWith('/accounts', options.params);
         });
 
         it('should clear stack when clearStack=true', function () {
@@ -427,18 +458,18 @@ describe('ngNavigation', function () {
         it('should route when routeTo is called', function () {
             Navigation.init();
 
-            spyOn(Navigation._p, '_route');
+            spyOn(Navigation, '_route');
             Navigation.routeTo('/accounts');
-            expect(Navigation._p._route).toHaveBeenCalled();
+            expect(Navigation._route).toHaveBeenCalled();
         });
     });
 
-    describe('Core, self.back', function () {
+    describe('Core, self.routeBack', function () {
         it('should not pop stack when stack is empty', function () {
             Navigation.init();
 
             spyOn(Navigation._routeStack, 'pop');
-            Navigation.back();
+            Navigation.routeBack();
             expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
         });
 
@@ -446,22 +477,22 @@ describe('ngNavigation', function () {
             Navigation.init();
 
             spyOn(Navigation._routeStack, 'pop');
-            spyOn(Navigation._p, '_route');
-            Navigation.back({ url: '/accounts', params: { x: 'y' } });
+            spyOn(Navigation, '_route');
+            Navigation.routeBack({ url: '/accounts', params: { x: 'y' } });
 
             expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
-            expect(Navigation._p._route).toHaveBeenCalled();
+            expect(Navigation._route).toHaveBeenCalled();
         });
 
         it('should use fallback stack when stack is empty (only url)', function () {
             Navigation.init();
 
             spyOn(Navigation._routeStack, 'pop');
-            spyOn(Navigation._p, '_route');
-            Navigation.back({ url: '/accounts' });
+            spyOn(Navigation, '_route');
+            Navigation.routeBack({ url: '/accounts' });
 
             expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
-            expect(Navigation._p._route).toHaveBeenCalledWith('/accounts', {});
+            expect(Navigation._route).toHaveBeenCalledWith('/accounts', {});
         });
 
         it('should pop stack when going back to previous page', function () {
@@ -475,7 +506,7 @@ describe('ngNavigation', function () {
 
                 // Stub out `$window.history.back` to avoid karma errors.
                 spyOn($window.history, 'back');
-                Navigation.back();
+                Navigation.routeBack();
                 expect(Navigation._routeStack.length).toBe(0);
             });
         });

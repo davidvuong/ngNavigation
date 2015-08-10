@@ -10,22 +10,16 @@
         var self = this;
         var defaultInitOptions = {
             appendSlash: false,
-            stripSlash:  false
+            stripSlash:  false,
+            rootRoute: undefined,
+            ignoreRoutes: []
         };
 
-        // Expose private methods to `_p` so they can be tested.
-        self._p = {
-            _route: _route,
-            _endsWith: _endsWith,
-            _overrideDefaults: _overrideDefaults,
-            _deconstructUrlPath: _deconstructUrlPath
-        };
-
-        function _endsWith(string, suffix) {
+        self._endsWith = function (string, suffix) {
             return string.indexOf(suffix, string.length - suffix.length) !== -1;
-        }
+        };
 
-        function _overrideDefaults(newDefaults) {
+        self._overrideDefaults = function (newDefaults) {
             if (!newDefaults) { return; }
 
             angular.forEach(newDefaults, function (value, key) {
@@ -36,9 +30,9 @@
             if (defaultInitOptions.appendSlash && defaultInitOptions.stripSlash) {
                 throw 'options.appendSlash and options.stripSlash are mutually exclusive';
             }
-        }
+        };
 
-        function _deconstructUrlPath(url) {
+        self._deconstructUrlPath = function (url) {
             var match,
                 pl     = /\+/g,  // Regex for replacing addition symbol with a space.
                 search = /([^&=]+)=?([^&]*)/g,
@@ -53,75 +47,116 @@
                 urlParams[decode(match[1])] = decode(match[2]);
             }
             return { url: baseUrl, params: urlParams };
-        }
+        };
 
-        function _route(url, params) {
+        self._route = function (url, params) {
             // URL Doesn't contain query params, just call `path`.
             if (!params) {
                 return $location.path(url);
             }
             // Ref: https://docs.angularjs.org/api/ng/service/$location
             return $location.path(url).search(params);
-        }
+        };
 
-        self.init = function (options) {
-            if (this._hasInit) { return; }
+        self._routeChangeListener = function (to, from, fromParams) {
+            // `self._isClearing` is set when we don't want to update the `_routeStack`
+            // after a navigation. It's useful when:
+            //  - We've cleared the `_routeStack` and then decide to navigate to R.
+            //      When we hit R, we don't want to be able to go back (not a fresh start)
+            //  - When we're going back to the previous route
+            //      Routing back technically is still a route and we don't want to add
+            //      the previous route back because it was the route we just popped!
+            //      [A, B] -> [A] (good!) but [A, B] -> [A] -> [A, B]... oh dear!
+            if (self._isClearing) {
+                self._isClearing = false;
+                return;
+            }
 
-            self._p._overrideDefaults(options);
-            self._hasInit    = true;
-            self._isClearing = false;
-            self._isRouting  = false;
-            self._routeStack = [];
+            // No previous route (first session visit) or is already routing.
+            if (self._isRouting || !from) {
+                return;
+            }
 
-            // Listen to `$routeChangeSuccess` to update `_routeStack` with the previous route.
+            // Navigating to the rootRoute clears the routeStack.
+            if (to === defaultInitOptions.rootRoute) {
+                return self.clearRouteStack();
+            }
+
+            // Edge case: A->B->A->B->A->...
             //
-            // `$routeChangeSuccess` might not be fired if a callback on `$routeChangeStart`
+            // Since the stack is updated *after* a successful route change
+            // with the previous route (not the current), we make sure that the
+            // current route isn't directly a previous route.
+            //
+            // ```
+            // (A->B*->A**)  // Bad! We don't clear duplicate back routes
+            // (A**->B*)     // Good! Duplicate back routes are popped
+            // ```
+            //
+            // So, we take a look at the stack (before updating) and check if
+            // the top of the stack (last previous) is the same as the current.
+            // If it is, remove it, otherwise carry on.
+            if (to === self.peakRouteStack().url) {
+                self._routeStack.pop();
+            }
+
+            // If the previous route is an ignored route, don't push to stack.
+            if (defaultInitOptions.ignoreRoutes.indexOf(from) !== -1) {
+                return;
+            }
+
+            self._isRouting = true;
+            self.pushToRouteStack(from, fromParams);
+            self._isRouting = false;
+        };
+
+        /* Checks whether or not ui.router is installed. */
+        self._isUiRouterInstalled = function () {
+            try {
+                angular.module('ui.router');
+            } catch (err) {
+                return false;
+            }
+            return true;
+        };
+
+        self._listenToRouteChange = function () {
+            // Listen to route changes and update `_routeStack` with the previous route.
+            //
+            // ChangeSuccess event might not be fired if a callback on `$routeChangeStart`
             // calls the `e.preventDefault()` method.
             //
             // See: https://docs.angularjs.org/api/ngRoute/service/$route
             //
             // NOTE: Again, note that the `_routeStack` is ALWAYS one route behind
             // the current route!
-            $rootScope.$on('$routeChangeSuccess', function (event, currentRoute, previousRoute) {
-                // `self._isClearing` is set when we don't want to update the `_routeStack`
-                // after a navigation. It's useful when:
-                //  - We've cleared the `_routeStack` and then decide to navigate to R.
-                //      When we hit R, we don't want to be able to go back (not a fresh start)
-                //  - When we're going back to the previous route
-                //      Routing back technically is still a route and we don't want to add
-                //      the previous route back because it was the route we just popped!
-                //      [A, B] -> [A] (good!) but [A, B] -> [A] -> [A, B]... oh dear!
-                if (self._isClearing) {
-                    self._isClearing = false;
-                    return;
-                }
+            var eventName, listener;
+            if (self._isUiRouterInstalled()) {
+                eventName = '$stateChangeSuccess';
+                listener = function (event, toState, toParams, fromState, fromParams) {
+                    if (!fromState.name) { return; }
+                    self._routeChangeListener(toState.url, fromState.url, fromParams);
+                };
+            } else {
+                eventName = '$routeChangeSuccess';
+                listener = function (event, to, from) {
+                    if (!from) { return; }
+                    self._routeChangeListener(to.originalPath, from.originalPath, from.params);
+                };
+            }
+            $rootScope.$on(eventName, listener);
+        };
 
-                // No previous route (first session visit) or is already routing.
-                if (self._isRouting || !previousRoute) {
-                    return;
-                }
+        self.init = function (options) {
+            if (this._hasInit) { return; }
 
-                // Edge case: A->B->A->B->A->...
-                //
-                // Since the stack is updated *after* a successful route change
-                // with the previous route (not the current), we make sure that the
-                // current route isn't directly a previous route.
-                //
-                // ```
-                // (A->B*->A**)  // Bad! We don't clear duplicate back routes
-                // (A**->B*)     // Good! Duplicate back routes are popped
-                // ```
-                //
-                // So, we take a look at the stack (before updating) and check if
-                // the top of the stack (last previous) is the same as the current.
-                // If it is, remove it, otherwise carry on.
-                if (currentRoute.originalPath === self.peakRouteStack().url) {
-                    self._routeStack.pop();
-                }
-                self._isRouting = true;
-                self.pushToRouteStack(previousRoute.originalPath, previousRoute.params);
-                self._isRouting = false;
-            });
+            self._overrideDefaults(options);
+            self._hasInit    = true;
+            self._isClearing = false;
+            self._isRouting  = false;
+            self._routeStack = [];
+
+            self._listenToRouteChange();
         };
 
         self.peakRouteStack = function () {
@@ -134,7 +169,7 @@
             if (!url) { return; }
 
             // `url` might contain query params, override `options.params` if so.
-            var parsedUrl = self._p._deconstructUrlPath(url);
+            var parsedUrl = self._deconstructUrlPath(url);
             if (parsedUrl.params && !angular.equals(parsedUrl.params, {})) {
                 url = parsedUrl.url;
                 options.params = parsedUrl.params;
@@ -142,10 +177,10 @@
             options.params = options.params || {};
 
             // Append or remove the trailing "/".
-            if (defaultInitOptions.appendSlash && !self._p._endsWith(url, '/')) {
+            if (defaultInitOptions.appendSlash && !self._endsWith(url, '/')) {
                 url += '/';
             }
-            if (defaultInitOptions.stripSlash && self._p._endsWith(url, '/')) {
+            if (defaultInitOptions.stripSlash && self._endsWith(url, '/')) {
                 url = url.substring(0, url.length - 1);
             }
 
@@ -170,18 +205,18 @@
             }
 
             // `url` might contain query params, override `options.params` if so.
-            var parsedUrl = self._p._deconstructUrlPath(url);
+            var parsedUrl = self._deconstructUrlPath(url);
             if (parsedUrl.params && !angular.equals(parsedUrl.params, {})) {
                 url = parsedUrl.url;
                 options.params = parsedUrl.params;
             }
             options.params = options.params || {};
 
-            self._p._route(url, options.params);
+            self._route(url, options.params);
             self._isRouting = false;
         };
 
-        self.back = function (fallbackRoute) {
+        self.routeBack = function (fallbackRoute) {
             fallbackRoute = fallbackRoute || {};
 
             var isBackRouteAvailable = self.isBackRouteAvailable();
@@ -193,7 +228,7 @@
             }
             // No routes in the routeStack however fallback provided.
             if (!isBackRouteAvailable && isFallbackRouteAvailable) {
-                return self._p._route(fallbackRoute.url, fallbackRoute.params || {});
+                return self._route(fallbackRoute.url, fallbackRoute.params || {});
             }
             // There are routes in the routeStack.
             self._routeStack.pop();

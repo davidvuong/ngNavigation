@@ -46,10 +46,20 @@ Route changes can be with through `href|ng-href` links in the view, `$location.p
 The `.init` method takes an optional argument, `options` in the form:
 
 ```js
-{ appendSlash: false, stripSlash: false };
+{
+    appendSlash: false,
+    stripSlash: false,
+    rootRoute: undefined,
+    ignoreRoutes: []
+};
 ```
 
-By default, both are set to `false`. These properties are mutually exclusive, meaning only one can be set to true at any single time. They're also optional.
+By default, `appendSlash` and `stripeSlash` are set to `false`. These properties are mutually exclusive, meaning only one can be set to true at any single time. They're also optional.
+
+In addition,
+
+* When `rootRoute` is defined, every route change that directs the client to `rootRoute` will clear the route stack
+* After a successful navigation, if the previous route exists in `ignoreRoutes`, it won't be pushed to the route stack
 
 #### `.routeTo(url, options)`
 
@@ -86,9 +96,9 @@ ngNavigation.routeTo('/accounts?tab=details', options);
 
 For example, you have a side-menu that's present throughout the app. The side-menu is the root of your navigation. It does not make much sense to be able to go back after re-routing via the root.
 
-#### `.back(fallbackRoute)`
+#### `.routeBack(fallbackRoute)`
 
-Routes back to the previous route. `back` calls `$window.history.back()` when a previous route is available, popping from the route stack. When no routes are available, no operations are made.
+Routes back to the previous route. `routeBack` calls `$window.history.back()` when a previous route is available, popping from the route stack. When no routes are available, no operations are made.
 
 `.back` also takes in an optional argument, `fallbackRoute` in the form:
 
@@ -96,18 +106,18 @@ Routes back to the previous route. `back` calls `$window.history.back()` when a 
 { url: '...', params: {} };
 ```
 
-Having a `fallbackRoute` ensures that if the route stack is empty, the call to `.back` will fallback to the provided `fallbackRoute`.
+Having a `fallbackRoute` ensures that if the route stack is empty, the call to `.routeBack` will fallback to the provided `fallbackRoute`.
 
 The `fallbackRoute` could be useful when you have external deep links to your app (e.g. an email notification).
 
-When a user clicks on the deep link (e.g. `/app/settings/notifications`), the route stack is empty. This means if you have a navigation bar with a back button that hooks onto `ngNavigation.back`, clicking that button won't take you back because the stack is empty. Having a `fallbackUrl` will ensure that navigation after deep links work.
+When a user clicks on the deep link (e.g. `/app/settings/notifications`), the route stack is empty. This means if you have a navigation bar with a back button that hooks onto `ngNavigation.routeBack`, clicking that button won't take you back because the stack is empty. Having a `fallbackUrl` will ensure that navigation after deep links work.
 
 For example:
 
 ```js
 // navigation.js (navbar controller).
 $scope.navigateBack = function () {
-    ngNavigation.back({ url: '/settings' });
+    ngNavigation.routeBack({ url: '/settings' });
 };
 ```
 

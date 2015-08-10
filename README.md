@@ -100,7 +100,7 @@ For example, you have a side-menu that's present throughout the app. The side-me
 
 Routes back to the previous route. `routeBack` calls `$window.history.back()` when a previous route is available, popping from the route stack. When no routes are available, no operations are made.
 
-`.back` also takes in an optional argument, `fallbackRoute` in the form:
+`.routeBack` also takes in an optional argument, `fallbackRoute` in the form:
 
 ```js
 { url: '...', params: {} };

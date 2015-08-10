@@ -123,9 +123,6 @@
         self._listenToRouteChange = function () {
             // Listen to route changes and update `_routeStack` with the previous route.
             //
-            // ChangeSuccess event might not be fired if a callback on `$routeChangeStart`
-            // calls the `e.preventDefault()` method.
-            //
             // See: https://docs.angularjs.org/api/ngRoute/service/$route
             //
             // NOTE: Again, note that the `_routeStack` is ALWAYS one route behind

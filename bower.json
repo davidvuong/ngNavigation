@@ -1,6 +1,6 @@
 {
   "name": "ngNavigation",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "main": [
     "js/ngNavigation.js",
     "js/ngNavigation.min.js"

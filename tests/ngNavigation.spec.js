@@ -482,6 +482,7 @@ describe('ngNavigation', function () {
 
             expect(Navigation._routeStack.pop).not.toHaveBeenCalled();
             expect(Navigation._route).toHaveBeenCalled();
+            expect(Navigation._isClearing).toBe(true);
         });
 
         it('should use fallback stack when stack is empty (only url)', function () {

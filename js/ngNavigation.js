@@ -225,6 +225,7 @@
             }
             // No routes in the routeStack however fallback provided.
             if (!isBackRouteAvailable && isFallbackRouteAvailable) {
+                self._isClearing = true;
                 return self._route(fallbackRoute.url, fallbackRoute.params || {});
             }
             // There are routes in the routeStack.

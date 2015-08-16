@@ -25,17 +25,13 @@ app.config(function (Navigation) {
 });
 
 app.controller('AppCtrl', function ($scope, Navigation) {
-    Navigation.routeTo('/accounts');
+    Navigation.routeTo('/settings?tab=accounts');
 });
 ```
 
 For more information, checkout the [documentation](https://github.com/davidvuong/ngNavigation/wiki/_documentation).
 
-### Documentation
-
-The documentation can be found [here](https://github.com/davidvuong/ngNavigation/wiki/_documentation).
-
-### Contributions
+### Development
 
 Clone and install dependencies:
 

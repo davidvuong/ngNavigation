@@ -77,6 +77,11 @@
                 return;
             }
 
+            // They're the same route... don't update the stack.
+            if (to === from) {
+                return;
+            }
+
             // Navigating to the rootRoute clears the routeStack.
             if (to === defaultInitOptions.rootRoute) {
                 return self.clearRouteStack();

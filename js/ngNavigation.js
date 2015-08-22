@@ -59,16 +59,21 @@
         };
 
         self._routeChangeListener = function (to, from, fromParams) {
-            // `self._isClearing` is set when we don't want to update the `_routeStack`
-            // after a navigation. It's useful when:
+            // `_isClearing`
+            //  - Stack cleared and route occurred immediately after. Useful when:
             //  - We've cleared the `_routeStack` and then decide to navigate to R.
             //      When we hit R, we don't want to be able to go back (not a fresh start)
-            //  - When we're going back to the previous route
+            //      - When we're going back to the previous route
             //      Routing back technically is still a route and we don't want to add
             //      the previous route back because it was the route we just popped!
             //      [A, B] -> [A] (good!) but [A, B] -> [A] -> [A, B]... oh dear!
-            if (self._isClearing) {
+            //
+            // `_isIgnoring`
+            //  - Route completed, ignore the previous from because `routeTo` asked
+            //  for it to be ignored.
+            if (self._isClearing || self._isIgnoring) {
                 self._isClearing = false;
+                self._isIgnoring = false;
                 return;
             }
 
@@ -153,8 +158,17 @@
             if (this._hasInit) { return; }
 
             self._overrideDefaults(options);
+
+            // Determines whether or not `self.init` has been called.
             self._hasInit    = true;
+
+            // Indicates `routeStack` was cleared, next route change is does not get pushed.
             self._isClearing = false;
+
+            // Indicates the previous route after a route change should be ignored.
+            self._isIgnoring = false;
+
+            // Indicates subsequent routes are dropped until the current route has completed.
             self._isRouting  = false;
             self._routeStack = [];
 
@@ -204,6 +218,10 @@
             self._isRouting = true;
             if (options.clearStack) {
                 self.clearRouteStack();
+            }
+
+            if (options.ignoreBackRoute) {
+                self._isIgnoring = true;
             }
 
             // `url` might contain query params, override `options.params` if so.

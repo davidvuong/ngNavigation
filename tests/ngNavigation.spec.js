@@ -398,6 +398,23 @@ describe('ngNavigation', function () {
             expect(Navigation._route).not.toHaveBeenCalled();
         });
 
+        it('should not push to stack when ignoreBackRoute=true', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+
+                // Test that the flag is correctly set.
+                expect(Navigation._isIgnoring).toBe(false);
+                Navigation.routeTo('/test-b', { ignoreBackRoute: true });
+                expect(Navigation._isIgnoring).toBe(true);
+
+                // Test that the flag is considered before pushing (i.e. do not push).
+                var pathA = { originalPath: '/test-a', params: {} };
+                var pathB = { originalPath: '/test-b', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', pathB, pathA);
+                expect(Navigation._routeStack.length).toBe(0);
+            });
+        });
+
         it('should ignore the previous route when route in ignore list', function () {
             inject(function ($rootScope) {
                 Navigation.init({ ignoreRoutes: ['/test-b'] });

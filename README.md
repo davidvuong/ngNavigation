@@ -1,9 +1,10 @@
 # ngNavigation
+
 [![Build Status](https://travis-ci.org/davidvuong/ngNavigation.svg?branch=master)](https://travis-ci.org/davidvuong/ngNavigation)
 
 ngNavigation a zero dependency AngularJS service that provides a simple way to navigate between different pages within your application.
 
-### Setup and install
+### Install
 
 ```bash
 # via bower:
@@ -15,7 +16,7 @@ npm install ng-navigation
 
 ### Basic usage
 
-Getting started is easy, just specify `ngNavigation` as a dependency and call `.init`.
+Specify `ngNavigation` as a dependency and call `.init` in your `app.config`.
 
 Here's an example:
 

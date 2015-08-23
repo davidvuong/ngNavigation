@@ -295,6 +295,16 @@ describe('ngNavigation', function () {
             expect(Navigation._routeStack.length).toBe(1);
         });
 
+        it('should not push when to and from routes are the same', function () {
+            inject(function ($rootScope) {
+                Navigation.init();
+
+                var path = { originalPath: '/test-a', params: {} };
+                $rootScope.$broadcast('$routeChangeSuccess', path, path);
+                expect(Navigation._routeStack.length).toBe(0);
+            });
+        });
+
         it('should label the route when the label exists', function () {
             Navigation.init();
             Navigation.pushToRouteStack('/accounts', { label: 'Back' });
@@ -527,6 +537,13 @@ describe('ngNavigation', function () {
                 Navigation.routeBack();
                 expect(Navigation._routeStack.length).toBe(0);
             });
+        });
+    });
+
+    describe('Core, self.getRouteStack', function () {
+        it('should return the routeStack when called', function () {
+            Navigation.init();
+            expect(Navigation.getRouteStack()).toEqual(Navigation._routeStack);
         });
     });
 });

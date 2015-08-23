@@ -2,7 +2,7 @@
   "author": "David Vuong <david.vuong256@gmail.com>",
   "name": "ng-navigation",
   "description": "Easily navigate between pages of your app",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "license": "MIT",
   "repository": {
     "type": "git",

@@ -26,9 +26,17 @@ module.exports = function (config) {
 
         // Pre-process matching files before serving them to the browser.
         //  Available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
-        preprocessors: {},
+        preprocessors: {
+            'js/ngNavigation.js': 'coverage'
+        },
 
-        reporters: ['progress'],
+        reporters: ['progress', 'coverage'],
+        coverageReporter: {
+            type: 'lcov',
+            dir: 'coverage/',
+            subdir: '.'
+        },
+
         port: 9876,
         colors: true,
 

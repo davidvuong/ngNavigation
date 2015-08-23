@@ -1,6 +1,7 @@
 # ngNavigation
 
 [![Build Status](https://travis-ci.org/davidvuong/ngNavigation.svg?branch=master)](https://travis-ci.org/davidvuong/ngNavigation)
+[![Coverage Status](https://coveralls.io/repos/davidvuong/ngNavigation/badge.svg?branch=master&service=github)](https://coveralls.io/github/davidvuong/ngNavigation?branch=master)
 
 ngNavigation a zero dependency AngularJS service that provides a simple way to navigate between different pages within your application.
 

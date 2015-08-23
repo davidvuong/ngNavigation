@@ -28,7 +28,7 @@
                 }
             });
             if (defaultInitOptions.appendSlash && defaultInitOptions.stripSlash) {
-                throw 'options.appendSlash and options.stripSlash are mutually exclusive';
+                throw 'appendSlash and stripSlash are mutually exclusive';
             }
         };
 
@@ -160,7 +160,7 @@
             self._overrideDefaults(options);
 
             // Determines whether or not `self.init` has been called.
-            self._hasInit    = true;
+            self._hasInit = true;
 
             // Indicates `routeStack` was cleared, next route change is does not get pushed.
             self._isClearing = false;

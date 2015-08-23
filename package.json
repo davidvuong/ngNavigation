@@ -10,6 +10,14 @@
   "scripts": {
     "test": "./node_modules/karma/bin/karma start --single-run --browsers PhantomJS"
   },
+  "keywords": [
+    "route",
+    "stack",
+    "navigate",
+    "navigation",
+    "angular",
+    "ngNavigation"
+  ],
   "dependencies": {},
   "devDependencies": {
     "angular": "^1.3.17",

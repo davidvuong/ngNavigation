@@ -7,9 +7,11 @@
   ],
   "keywords": [
     "route",
+    "stack",
     "navigate",
     "navigation",
-    "angular"
+    "angular",
+    "ngNavigation"
   ],
   "authors": [
     "David Vuong <david.vuong256@gmail.com>"

@@ -5,8 +5,12 @@ ngNavigation a zero dependency AngularJS service that provides a simple way to n
 
 ### Setup and install
 
-```
+```bash
+# via bower:
 bower install ngNavigation
+
+# via npm:
+npm install ng-navigation
 ```
 
 ### Basic usage

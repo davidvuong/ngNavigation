@@ -17,5 +17,12 @@
     "David Vuong <david.vuong256@gmail.com>"
   ],
   "license": "MIT",
-  "ignore": []
+  "ignore": [
+    "tests/",
+    "examples/",
+    "node_modules/"
+  ],
+  "devDependencies": {
+    "angular": "^1.3.17"
+  }
 }

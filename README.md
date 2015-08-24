@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/davidvuong/ngNavigation.svg?branch=master)](https://travis-ci.org/davidvuong/ngNavigation)
 [![Coverage Status](https://coveralls.io/repos/davidvuong/ngNavigation/badge.svg?branch=master&service=github)](https://coveralls.io/github/davidvuong/ngNavigation?branch=master)
-[![Code Climate](https://codeclimate.com/repos/55d99814e30ba0104700022a/badges/d2abf4fd26ba66a0653e/gpa.svg)](https://codeclimate.com/repos/55d99814e30ba0104700022a/feed)
+[![Code Climate](https://codeclimate.com/github/davidvuong/ngNavigation/badges/gpa.svg)](https://codeclimate.com/github/davidvuong/ngNavigation)
 [![npm version](https://badge.fury.io/js/ng-navigation.svg)](http://badge.fury.io/js/ng-navigation)
 [![Bower version](https://badge.fury.io/bo/ngNavigation.svg)](http://badge.fury.io/bo/ngNavigation)
 
